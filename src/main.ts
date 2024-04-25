@@ -17,7 +17,6 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   app.enableCors();
-  // configureSwagger(app);
 
   const configSwagger = new DocumentBuilder()
     .setTitle('API Products')
