@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
-@Injectable()
+@Module({
+  imports: [],
+  controllers: [],
+  providers: [],
+})
 export class PostgresDatabase {}
