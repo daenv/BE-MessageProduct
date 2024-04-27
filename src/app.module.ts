@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { PostgresDatabaseModule } from './databases/postgres/postgres.database';
+import { AuthModule } from './apps';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,6 +19,7 @@ import { PostgresDatabaseModule } from './databases/postgres/postgres.database';
       },
     }),
     PostgresDatabaseModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
