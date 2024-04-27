@@ -2,6 +2,7 @@ import { Body, Controller, Headers, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import _ from 'underscore';
 import { CreateUserDto } from './dtos';
+import { MessageResponse } from 'src/common/interfaces';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -17,7 +18,7 @@ export class AuthController {
   public async register(
     @Body() _req: CreateUserDto,
     @Headers() _headers: any,
-  ): Promise<unknown> {
+  ): Promise<MessageResponse> {
     const register = await this.authService.register(_req, _headers);
     return _.omit(register, 'password');
   }
