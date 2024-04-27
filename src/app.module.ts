@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
+import { PostgresDatabaseModule } from './databases/postgres/postgres.database';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -16,6 +17,7 @@ import * as Joi from 'joi';
         abortEarly: true,
       },
     }),
+    PostgresDatabaseModule,
   ],
   controllers: [],
   providers: [],
