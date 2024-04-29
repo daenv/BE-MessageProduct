@@ -10,6 +10,7 @@ import { BaseEntity } from './bases';
 import { IUserEntity } from './interfaces';
 import { SessionEntity } from './session.entity';
 import { RoleEntity } from './role.entity';
+import { KeyTokenEntity } from './keyToken.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity implements IUserEntity {
@@ -27,4 +28,8 @@ export class UserEntity extends BaseEntity implements IUserEntity {
   @ManyToMany(() => RoleEntity)
   @JoinTable()
   roles: RoleEntity[];
+
+  @ManyToMany(() => KeyTokenEntity)
+  @JoinTable()
+  keyTokens: KeyTokenEntity[];
 }
