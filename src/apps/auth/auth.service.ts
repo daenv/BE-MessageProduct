@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 
 import { CreateUserDto } from './dtos';
 import { CustomException, MessageResponse } from 'src/common';
