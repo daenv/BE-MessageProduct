@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 import { CreateUserDto } from './dtos';
 import { CustomException, MessageResponse } from 'src/common';
-import { KeytokenService } from '../keytoken/keytoken.service';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -10,10 +9,7 @@ export class AuthService {
   /**
    *
    */
-  constructor(
-    private readonly _keyTokenService: KeytokenService,
-    private readonly _userSerivce: UsersService,
-  ) {}
+  constructor(private readonly _userSerivce: UsersService) {}
 
   /**
    *
@@ -41,7 +37,7 @@ export class AuthService {
         message: 'Email is exist',
       };
     }
-    const createUserRegister = await this._userSerivce.createUser(_req, header);
+    const createUserRegister = await this._userSerivce.createUser(_req);
     return createUserRegister;
   }
 }
