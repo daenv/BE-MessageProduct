@@ -5,7 +5,6 @@ import { UserEntity } from 'src/entities';
 import { UserRepository } from 'src/repositories';
 import { CreateUserDto } from './dtos';
 
-import * as JWT from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { KeytokenService } from '../keytoken/keytoken.service';
 
@@ -42,10 +41,7 @@ export class UsersService {
     return foundUser;
   }
 
-  public async createUser(
-    user: CreateUserDto,
-    header: any,
-  ): Promise<MessageResponse> {
+  public async createUser(user: CreateUserDto): Promise<MessageResponse> {
     try {
       const salt = bcrypt.genSaltSync(10);
 
@@ -76,7 +72,7 @@ export class UsersService {
         message: 'User created successfully',
         data: {
           user: newUser,
-          keyToken: keyToken.refreshToken,
+          keyToken: keyToken.accessToken,
         },
       };
     } catch (error) {
