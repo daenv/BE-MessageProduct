@@ -98,4 +98,29 @@ export class KeytokenService {
       throw new CustomException(error);
     }
   }
+  public async createToken(payload: any): Promise<string> {
+    try {
+      const { publicKey, privateKey } = await this.generateRsaKeyPair();
+      const token = await this.createTokenPair(payload, publicKey, privateKey);
+      await this.saveKeyToken(token.refreshToken, publicKey);
+      return token.accessToken;
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
+
+  public async refreshToken(token: string): Promise<string> {
+    try {
+      const { publicKey, privateKey } = await this.generateRsaKeyPair();
+      const tokenPair = await this.createTokenPair(
+        token,
+        publicKey,
+        privateKey,
+      );
+      await this.saveKeyToken(tokenPair.refreshToken, publicKey);
+      return tokenPair.accessToken;
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
 }
