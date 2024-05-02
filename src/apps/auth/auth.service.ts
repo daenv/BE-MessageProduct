@@ -1,24 +1,58 @@
 import { Injectable } from '@nestjs/common';
-
-import { CreateUserDto } from './dtos';
+import * as bcrypt from 'bcrypt';
+import { CreateUserDto, LoginDto } from './dtos';
 import { CustomException, MessageResponse } from 'src/common';
 import { UsersService } from '../users/users.service';
+import { KeytokenService } from '../keytoken/keytoken.service';
 
 @Injectable()
 export class AuthService {
   /**
    *
    */
-  constructor(private readonly _userSerivce: UsersService) {}
+  constructor(
+    private readonly _userSerivce: UsersService,
+    private readonly _keyTokenService: KeytokenService,
+  ) {}
 
   /**
    *
    *
    */
 
-  public async login() {}
+  public async login(_req: LoginDto): Promise<MessageResponse> {
+    try {
+      console.log(_req);
+      // find username
+      const foundUser = await this._userSerivce.foundUserByUserName(
+        _req.username,
+      );
+      // check password
+      const checkPassword = await bcrypt.compare(
+        _req.password,
+        foundUser.password,
+      );
+      if (!checkPassword) {
+        return {
+          success: false,
+          message: 'Password is incorrect',
+        };
+      }
+      // create token
+      const token = await this._keyTokenService.createToken(foundUser.id);
+      return {
+        success: true,
+        message: 'Login success',
+        data: {
+          token: token,
+        },
+      };
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
 
-  public async register(_req: CreateUserDto, header: any): Promise<unknown> {
+  public async register(_req: CreateUserDto): Promise<unknown> {
     // const check username
     const checkUserName = await this._userSerivce.foundUserByUserName(
       _req.username,
