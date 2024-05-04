@@ -44,12 +44,14 @@ export class UsersService {
   public async createUser(user: CreateUserDto): Promise<MessageResponse> {
     try {
       const salt = bcrypt.genSaltSync(10);
-
+      // hash password
       const hashedPw = await bcrypt.hash(user.password, salt);
+      // create user
       const newUser = await this._userRepository.create({
         ...user,
         password: hashedPw,
       });
+      // save user
       await this._userRepository.save(newUser);
       const { publicKey, privateKey } =
         await this._keyTokenService.generateRsaKeyPair();
@@ -60,7 +62,6 @@ export class UsersService {
         publicKey,
         privateKey,
       );
-      //       console.log('keyToken:::', keyToken);
       // save KeyToken
       await this._keyTokenService.saveKeyToken(
         keyToken.refreshToken,
