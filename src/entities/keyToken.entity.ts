@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany } from 'typeorm';
+import { Column, Entity, OneToOne } from 'typeorm';
 import { BaseEntity } from './bases';
 import { IKeyTokenEntity } from './interfaces';
 import { UserEntity } from './user.entity';
@@ -8,6 +8,6 @@ export class KeyTokenEntity extends BaseEntity implements IKeyTokenEntity {
   publicKey: string;
   @Column({ name: 'refresh_token', type: 'varchar' })
   refreshToken: string[] = [];
-  @ManyToMany(() => UserEntity)
+  @OneToOne(() => UserEntity)
   users: UserEntity[];
 }
