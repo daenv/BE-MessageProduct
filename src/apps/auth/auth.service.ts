@@ -32,19 +32,31 @@ export class AuthService {
         _req.password,
         foundUser.password,
       );
+
       if (!checkPassword) {
         return {
           success: false,
           message: 'Password is incorrect',
         };
       }
+
+      delete _req.password;
+
+      console.log('userr::', foundUser);
+
+      const keyToken = await this._keyTokenService.findTokenByIdUser(
+        foundUser.id,
+      );
+
+      console.log('keyToken::', keyToken);
       // create token
-      const token = await this._keyTokenService.createToken(foundUser.id);
+      // const token = await this._keyTokenService.createToken(foundUser);
+
       return {
         success: true,
         message: 'Login success',
         data: {
-          token: token,
+          // token: token,
         },
       };
     } catch (error) {
