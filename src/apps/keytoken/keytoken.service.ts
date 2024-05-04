@@ -77,6 +77,19 @@ export class KeytokenService {
       throw new CustomException(error);
     }
   }
+  public async findTokenByIdUser(userId: string): Promise<unknown> {
+    try {
+      const keyToken = await this._keyTokenRepository
+        .createQueryBuilder('keyToken')
+        .innerJoinAndSelect('keyToken.users', 'userId')
+        .where('user.id = :userId', { userId })
+        .getMany();
+      console.log('keyToken::', keyToken);
+      return keyToken;
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
 
   public async saveKeyToken(
     token: string,
