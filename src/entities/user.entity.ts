@@ -22,7 +22,7 @@ export class UserEntity extends BaseEntity implements IUserEntity {
   email: string;
   @Column({ type: 'varchar', name: 'password' })
   password: string;
-  @OneToMany(() => SessionEntity, (session) => session.user)
+  @OneToMany(() => SessionEntity, (session) => session.lastChangedDateTime)
   sessions: SessionEntity[];
 
   @ManyToMany(() => RoleEntity)
