@@ -5,7 +5,6 @@ import {
   JoinTable,
   ManyToMany,
   OneToMany,
-  OneToOne,
 } from 'typeorm';
 import { BaseEntity } from './bases';
 import { IUserEntity } from './interfaces';
@@ -30,7 +29,7 @@ export class UserEntity extends BaseEntity implements IUserEntity {
   @JoinTable()
   roles: RoleEntity[];
 
-  @OneToOne(() => KeyTokenEntity)
+  @ManyToMany(() => KeyTokenEntity)
   @JoinTable()
   keyTokens: KeyTokenEntity[];
 }
