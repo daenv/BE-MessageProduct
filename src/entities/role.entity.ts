@@ -1,7 +1,6 @@
-import { Column, Entity, ManyToMany } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { BaseEntity } from './bases';
 import { IRoleEntity } from './interfaces';
-import { UserEntity } from './user.entity';
 
 @Entity({ name: 'roles' })
 export class RoleEntity extends BaseEntity implements IRoleEntity {
@@ -9,6 +8,4 @@ export class RoleEntity extends BaseEntity implements IRoleEntity {
   name: string;
   @Column({ type: 'varchar', name: 'role_description' })
   description: string;
-  @ManyToMany(() => UserEntity)
-  users: UserEntity[];
 }
