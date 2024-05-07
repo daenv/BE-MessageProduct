@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginDto } from './dtos';
 import _ from 'underscore';
+
 @Controller('auth')
 export class AuthController {
   /**
