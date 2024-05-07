@@ -4,6 +4,7 @@ import * as Joi from 'joi';
 import { PostgresDatabaseModule } from './databases/postgres/postgres.database';
 import { AuthModule } from './apps';
 import { LoggerMiddleware } from './middlewares/Logger.middleware';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
