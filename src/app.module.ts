@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { PostgresDatabaseModule } from './databases/postgres/postgres.database';
 import { AuthModule } from './apps';
+import { LoggerMiddleware } from './middlewares/Logger.middleware';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,4 +25,8 @@ import { AuthModule } from './apps';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
