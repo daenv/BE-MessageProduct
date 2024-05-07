@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from 'src/repositories';
+import { InjectRepository } from '@nestjs/typeorm';
+import { EntityManager } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+
 import { CreateUserDto } from './dtos';
 import { CustomException, MessageResponse } from 'src/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/entities';
-import { EntityManager } from 'typeorm';
+import { KeytokenService } from '../keytoken';
 
 @Injectable()
 export class UsersService {
@@ -15,6 +18,7 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private readonly _usersRepository: UserRepository,
     private readonly entityManager: EntityManager,
+    private readonly _keyTokenService: KeytokenService,
   ) {}
 
   private async getUsers(): Promise<UserEntity[]> {
@@ -47,12 +51,22 @@ export class UsersService {
           data: user,
         };
       }
-      // create User
-
+      // hash password
+      const salt = bcrypt.genSaltSync(10);
+      const hasdPw = bcrypt.hashSync(user.password, salt);
+      // create user
+      const newUser = new UserEntity({
+        username: user.username,
+        email: user.email,
+        password: hasdPw,
+      });
+      const savedUser = await this.entityManager.save(newUser);
       return {
-        success: false,
+        success: true,
         message: 'User created successfully',
-        data: user,
+        data: {
+          user: savedUser,
+        },
       };
     } catch (error) {
       throw new CustomException(error);
