@@ -51,7 +51,7 @@ export class AuthService {
           data: {},
         };
       }
-      // create Token
+
       const createToken = await this._keyTokenService.createNewToken(
         foundUser.id,
       );
@@ -62,12 +62,12 @@ export class AuthService {
       });
 
       foundUser.keyTokens = [saveKeyToken];
-
       await this.entityManager.save(foundUser);
+      // save cookie
       return {
         success: true,
         message: 'Login Success',
-        data: foundUser,
+        data: createToken.refreshToken,
       };
     } catch (error) {
       throw new CustomException(error);
