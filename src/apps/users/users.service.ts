@@ -28,7 +28,7 @@ export class UsersService {
       throw new CustomException(error);
     }
   }
-  private async getUserByUserName(userName: string): Promise<UserEntity> {
+  public async getUserByUserName(userName: string): Promise<UserEntity> {
     try {
       const foundUser = await this._usersRepository.findOne({
         where: { username: userName },
