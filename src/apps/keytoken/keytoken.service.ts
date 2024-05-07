@@ -78,7 +78,9 @@ export class KeytokenService {
     }
   }
 
-  public async createNewToken(payload: string): Promise<unknown> {
+  public async createNewToken(
+    payload: string,
+  ): Promise<{ publicKey: string; refreshToken: string }> {
     try {
       const { publicKey, privateKey } = await this.generateRsaKeyPair();
 
@@ -88,7 +90,7 @@ export class KeytokenService {
         publicKey,
         privateKey,
       );
-      return keyToken;
+      return { publicKey, refreshToken: keyToken.refreshToken };
     } catch (error) {
       throw new CustomException(error);
     }
