@@ -6,14 +6,15 @@ import {
   ManyToMany,
   OneToMany,
 } from 'typeorm';
-import { BaseEntity } from './bases';
+
 import { IUserEntity } from './interfaces';
 import { SessionEntity } from './session.entity';
 import { RoleEntity } from './role.entity';
 import { KeyTokenEntity } from './keyToken.entity';
+import { IdEntity } from './bases/id.base.entity';
 
 @Entity({ name: 'users' })
-export class UserEntity extends BaseEntity implements IUserEntity {
+export class UserEntity extends IdEntity<UserEntity> implements IUserEntity {
   @Index('IX_USER_USERNAME', { unique: true })
   @Column({ type: 'varchar', name: 'username' })
   username: string;
@@ -25,11 +26,11 @@ export class UserEntity extends BaseEntity implements IUserEntity {
   @OneToMany(() => SessionEntity, (session) => session.lastChangedDateTime)
   sessions: SessionEntity[];
 
-  @ManyToMany(() => RoleEntity)
+  @ManyToMany(() => RoleEntity, { cascade: true })
   @JoinTable()
   roles: RoleEntity[];
 
-  @ManyToMany(() => KeyTokenEntity)
+  @ManyToMany(() => KeyTokenEntity, { cascade: true })
   @JoinTable()
   keyTokens: KeyTokenEntity[];
 }
