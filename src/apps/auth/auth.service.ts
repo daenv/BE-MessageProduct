@@ -6,8 +6,12 @@ import { UsersService } from '../users/users.service';
 import checkUsername from 'src/utils/checkUserName/check-username.util';
 import { CustomException, MessageResponse } from 'src/common';
 import { KeytokenService } from '../keytoken';
-import { KeyTokenEntity } from 'src/entities';
+import { KeyTokenEntity, SessionEntity } from 'src/entities';
 import { EntityManager } from 'typeorm';
+
+import { RefreshTokenDto } from './dtos/refreshToken.dto';
+import { Response } from 'express';
+import { setExpireAt } from 'src/utils';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +24,18 @@ export class AuthService {
     private readonly entityManager: EntityManager,
   ) {}
 
+  private async setRefreshTokenCookie(
+    res: Response,
+    refreshToken: string,
+  ): Promise<void> {
+    const expires = setExpireAt(3);
+    res.cookie('Authentication', refreshToken, {
+      secure: true,
+      httpOnly: true,
+      expires,
+    });
+  }
+
   public async register(registerDto: CreateUserDto): Promise<unknown> {
     try {
       // check UserName
@@ -30,7 +46,10 @@ export class AuthService {
       throw new CustomException(error);
     }
   }
-  public async login(loginDto: LoginDto): Promise<MessageResponse> {
+  public async login(
+    loginDto: LoginDto,
+    res: Response,
+  ): Promise<MessageResponse> {
     try {
       const foundUser = await this._userService.getUserByUserName(
         loginDto.username,
@@ -55,19 +74,50 @@ export class AuthService {
       const createToken = await this._keyTokenService.createNewToken(
         foundUser.id,
       );
-
       const saveKeyToken = new KeyTokenEntity({
         publicKey: createToken.publicKey,
         refreshToken: [createToken.refreshToken],
       });
+      const createSession = new SessionEntity({
+        users: foundUser,
+        token: createToken.refreshToken,
+        expiresAt: setExpireAt(3),
+      });
+      // save token to database
+      await this.entityManager.transaction(async (entityManager) => {
+        // save token to database
+        await entityManager.save(saveKeyToken);
+        // save session to database
+        await entityManager.save(createSession);
 
-      foundUser.keyTokens = [saveKeyToken];
-      await this.entityManager.save(foundUser);
-      // save cookie
+        // add token to user
+        foundUser.keyTokens = [saveKeyToken];
+        // add session to user
+        // foundUser.sessions = [createSession];
+
+        await entityManager.save(foundUser);
+      });
+      // set cookie
+      this.setRefreshTokenCookie(res, createToken.refreshToken);
+
       return {
         success: true,
         message: 'Login Success',
         data: createToken.refreshToken,
+      };
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
+  public async refreshToken(
+    refreshToken: RefreshTokenDto,
+  ): Promise<MessageResponse> {
+    try {
+      console.log(refreshToken);
+      return {
+        success: true,
+        message: 'Refresh Token Success',
+        data: {},
       };
     } catch (error) {
       throw new CustomException(error);
