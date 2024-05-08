@@ -39,6 +39,19 @@ export class UsersService {
       throw new CustomException(error);
     }
   }
+  public async getUserById(id: string): Promise<UserEntity> {
+    try {
+      const foundUser = await this._usersRepository.findOne({
+        where: {
+          id: id,
+        },
+        relations: ['keyTokens'],
+      });
+      return foundUser;
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
 
   public async createUser(user: CreateUserDto): Promise<MessageResponse> {
     try {
