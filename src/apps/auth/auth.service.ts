@@ -11,6 +11,7 @@ import { EntityManager } from 'typeorm';
 
 import { Response, Request } from 'express';
 import { setExpireAt } from 'src/utils';
+import { SessionsService } from '../sessions/sessions.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
   constructor(
     private readonly _userService: UsersService,
     private readonly _keyTokenService: KeytokenService,
+    private readonly _sessionService: SessionsService,
     private readonly entityManager: EntityManager,
   ) {}
 
@@ -115,7 +117,8 @@ export class AuthService {
   public async refreshToken(token: string): Promise<MessageResponse> {
     try {
       // verify tokenn
-      // const findToken =
+      const foundToken = await this._sessionService.findSession(token);
+      console.log('foundToken::', foundToken.users);
       return {
         success: true,
         message: 'Refresh Token Success',
