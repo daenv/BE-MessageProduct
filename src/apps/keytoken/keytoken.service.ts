@@ -102,4 +102,26 @@ export class KeytokenService {
       throw new CustomException(error);
     }
   }
+  public async updateKeyTokenById(
+    id: string,
+    token: string,
+    publicKey: string,
+  ): Promise<KeyTokenEntity> {
+    try {
+      const foundToken = await this._keyTokenRepository.findOne({
+        where: {
+          id: id,
+        },
+      });
+      console.log('KeyToken::', foundToken);
+      if (!foundToken) {
+        throw new CustomException('Token not found');
+      }
+      foundToken.publicKey = publicKey;
+      foundToken.refreshToken.push(token);
+      return foundToken;
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
 }
