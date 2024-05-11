@@ -69,28 +69,35 @@ export class KeytokenService {
       throw new CustomException(error);
     }
   }
-  public async verifyToken(token: string, publicKey: string): Promise<any> {
-    try {
-      const decoded = await JWT.verify(token, publicKey);
-      return decoded;
-    } catch (error) {
-      throw new CustomException(error);
-    }
-  }
 
   public async createNewToken(
     payload: string,
   ): Promise<{ publicKey: string; refreshToken: string }> {
     try {
       const { publicKey, privateKey } = await this.generateRsaKeyPair();
-
-      // create KeyToken
       const keyToken = await this.createTokenPair(
         { userId: payload },
         publicKey,
         privateKey,
       );
       return { publicKey, refreshToken: keyToken.refreshToken };
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
+
+  public async findToken(token: string): Promise<KeyTokenEntity> {
+    try {
+      const foundToken = await this._keyTokenRepository.findOne({
+        where: {
+          refreshToken: token,
+        },
+      });
+      console.log('KeyToken::', foundToken);
+      if (!foundToken) {
+        throw new CustomException('Token not found');
+      }
+      return foundToken;
     } catch (error) {
       throw new CustomException(error);
     }
