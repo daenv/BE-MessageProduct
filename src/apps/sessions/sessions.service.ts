@@ -14,7 +14,7 @@ export class SessionsService {
     private readonly _sessionRepository: SessionRepository,
   ) {}
 
-  public async findSession(token: string): Promise<SessionEntity> {
+  public async findSessionByToken(token: string): Promise<SessionEntity> {
     try {
       const session = await this._sessionRepository.findOne({
         where: {
@@ -22,7 +22,32 @@ export class SessionsService {
         },
         relations: ['users'],
       });
-      console.log('session::', session);
+      return session;
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
+  public async findSessionById(id: string): Promise<SessionEntity> {
+    const session = await this._sessionRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: ['users'],
+    });
+    return session;
+  }
+  catch(error) {
+    throw new CustomException(error);
+  }
+  public async updateSession(
+    id: string,
+    token: string,
+  ): Promise<SessionEntity> {
+    try {
+      const session = await this.findSessionById(id);
+      session.expiresAt = new Date();
+      session.token = token;
+      await this._sessionRepository.save(session);
       return session;
     } catch (error) {
       throw new CustomException(error);
