@@ -28,9 +28,13 @@ export class AuthController {
     return _.omit(register, 'password');
   }
   @Put('refresh-token')
-  public async refreshToken(@Headers() _header: any): Promise<unknown> {
+  public async refreshToken(
+    @Headers() _header: any,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<unknown> {
     const refresh = await this._authService.refreshToken(
       _header.authentication,
+      res,
     );
     return _.omit(refresh, 'password');
   }
