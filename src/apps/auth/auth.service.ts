@@ -9,7 +9,7 @@ import { KeytokenService } from '../keytoken';
 import { KeyTokenEntity, SessionEntity } from 'src/entities';
 import { EntityManager } from 'typeorm';
 
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { setExpireAt } from 'src/utils';
 import { SessionsService } from '../sessions/sessions.service';
 
@@ -25,6 +25,16 @@ export class AuthService {
     private readonly entityManager: EntityManager,
   ) {}
 
+  private async saveKeyToken(
+    publicKey: string,
+    token: string,
+  ): Promise<KeyTokenEntity> {
+    const saveKeyToken = new KeyTokenEntity({
+      publicKey: publicKey,
+    });
+    saveKeyToken.refreshToken.push(token);
+    return await this.entityManager.save(saveKeyToken);
+  }
   private async setRefreshTokenCookie(
     res: Response,
     refreshToken: string,
@@ -76,10 +86,10 @@ export class AuthService {
         foundUser.id,
       );
 
-      const saveKeyToken = new KeyTokenEntity({
-        publicKey: createToken.publicKey,
-      });
-      saveKeyToken.refreshToken.push(createToken.refreshToken);
+      const saveKeyToken = await this.saveKeyToken(
+        createToken.publicKey,
+        createToken.refreshToken,
+      );
 
       const createSession = new SessionEntity({
         users: foundUser,
@@ -108,21 +118,41 @@ export class AuthService {
       return {
         success: true,
         message: 'Login Success',
-        data: createToken.refreshToken,
+        data: { token: createToken.refreshToken },
       };
     } catch (error) {
       throw new CustomException(error);
     }
   }
-  public async refreshToken(token: string): Promise<MessageResponse> {
+  public async refreshToken(
+    token: string,
+    res: Response,
+  ): Promise<MessageResponse> {
     try {
       // verify tokenn
-      const foundToken = await this._sessionService.findSession(token);
-      console.log('foundToken::', foundToken.users);
+      const foundSession = await this._sessionService.findSessionByToken(token);
+      const foundUser = await this._userService.getUserById(
+        foundSession.users.id,
+      );
+
+      const createToken = await this._keyTokenService.createNewToken(
+        foundUser.id,
+      );
+      // update session
+      await this._sessionService.updateSession(
+        foundSession.id,
+        createToken.refreshToken,
+      );
+      // save key token
+      await this.saveKeyToken(createToken.publicKey, createToken.refreshToken);
+
+      // set cookie
+      this.setRefreshTokenCookie(res, createToken.refreshToken);
+
       return {
         success: true,
         message: 'Refresh Token Success',
-        data: {},
+        data: { token: createToken.refreshToken },
       };
     } catch (error) {
       throw new CustomException(error);
