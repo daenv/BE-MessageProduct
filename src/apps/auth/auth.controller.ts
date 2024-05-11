@@ -1,8 +1,8 @@
-import { Body, Controller, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Post, Put, Headers, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginDto } from './dtos';
 import _ from 'underscore';
-import { RefreshTokenDto } from './dtos/refreshToken.dto';
+
 // import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Response } from 'express';
 
@@ -28,8 +28,10 @@ export class AuthController {
     return _.omit(register, 'password');
   }
   @Put('refresh-token')
-  public async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    const refresh = await this._authService.refreshToken(refreshTokenDto);
+  public async refreshToken(@Headers() _header: any): Promise<unknown> {
+    const refresh = await this._authService.refreshToken(
+      _header.authentication,
+    );
     return _.omit(refresh, 'password');
   }
 }
