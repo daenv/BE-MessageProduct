@@ -9,8 +9,7 @@ import { KeytokenService } from '../keytoken';
 import { KeyTokenEntity, SessionEntity } from 'src/entities';
 import { EntityManager } from 'typeorm';
 
-import { RefreshTokenDto } from './dtos/refreshToken.dto';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { setExpireAt } from 'src/utils';
 
 @Injectable()
@@ -74,10 +73,12 @@ export class AuthService {
       const createToken = await this._keyTokenService.createNewToken(
         foundUser.id,
       );
+
       const saveKeyToken = new KeyTokenEntity({
         publicKey: createToken.publicKey,
-        refreshToken: [createToken.refreshToken],
       });
+      saveKeyToken.refreshToken.push(createToken.refreshToken);
+
       const createSession = new SessionEntity({
         users: foundUser,
         token: createToken.refreshToken,
@@ -87,11 +88,13 @@ export class AuthService {
       await this.entityManager.transaction(async (entityManager) => {
         // save token to database
         await entityManager.save(saveKeyToken);
+
         // save session to database
         await entityManager.save(createSession);
 
         // add token to user
         foundUser.keyTokens = [saveKeyToken];
+
         // add session to user
         // foundUser.sessions = [createSession];
 
@@ -109,11 +112,10 @@ export class AuthService {
       throw new CustomException(error);
     }
   }
-  public async refreshToken(
-    refreshToken: RefreshTokenDto,
-  ): Promise<MessageResponse> {
+  public async refreshToken(token: string): Promise<MessageResponse> {
     try {
-      console.log(refreshToken);
+      // verify tokenn
+      // const findToken =
       return {
         success: true,
         message: 'Refresh Token Success',
