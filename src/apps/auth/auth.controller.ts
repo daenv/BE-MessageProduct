@@ -38,4 +38,11 @@ export class AuthController {
     );
     return _.omit(refresh, 'password');
   }
+  @Put('logout')
+  public async logout(
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<unknown> {
+    const logout = await this._authService.logout(res);
+    return _.omit(logout, 'password');
+  }
 }
