@@ -158,4 +158,17 @@ export class AuthService {
       throw new CustomException(error);
     }
   }
+  public async logout(res: Response): Promise<MessageResponse> {
+    try {
+      // refresh token
+      res.clearCookie('Authentication', { path: '/' });
+      return {
+        success: true,
+        message: 'Logout Success',
+        data: {},
+      };
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
 }
