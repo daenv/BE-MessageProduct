@@ -43,6 +43,7 @@ export class AuthService {
     res.cookie('Authentication', refreshToken, {
       secure: true,
       httpOnly: true,
+
       expires,
     });
   }
