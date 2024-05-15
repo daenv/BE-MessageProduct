@@ -84,7 +84,7 @@ export class RolesService {
       });
       return {
         success: true,
-        message: 'role' + name + 'created',
+        message: 'role' + role.name + 'created',
         data: { role: role },
       };
     } catch (error) {
