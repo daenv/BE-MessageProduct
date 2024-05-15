@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from 'src/repositories';
+import { UserRepository } from 'src/repositories/postgres/user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -21,13 +21,13 @@ export class UsersService {
     private readonly _keyTokenService: KeytokenService,
   ) {}
 
-  private async getUsers(): Promise<UserEntity[]> {
-    try {
-      return;
-    } catch (error) {
-      throw new CustomException(error);
-    }
-  }
+  // private async getUsers(): Promise<UserEntity[]> {
+  //   try {
+  //     // const foundUsers = await this._usersRepository.find()
+  //   } catch (error) {
+  //     throw new CustomException(error);
+  //   }
+  // }
   public async getUserByUserName(userName: string): Promise<UserEntity> {
     try {
       const foundUser = await this._usersRepository.findOne({
